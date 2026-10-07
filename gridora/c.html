@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gridora-Challenge</title>
+<meta property="og:title" content="Gridora-Challenge">
+<meta property="og:description" content="Gleiche Teile, ein Versuch – schaffst du mehr Punkte?">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: radial-gradient(circle at 30% 10%, #2b2260, #0d0b1f 70%); color: #fff; padding: 24px 16px; }
+  .card { width: 100%; max-width: 420px; text-align: center; background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 28px; padding: 32px 22px; }
+  .flag { font-size: 52px; line-height: 1; }
+  h1 { font-size: 1.6rem; margin: 14px 0 6px; }
+  .score { font-size: 3rem; font-weight: 800; margin: 6px 0; background: linear-gradient(135deg, #ffc84d, #ff6b4d);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p { color: rgba(255,255,255,0.75); line-height: 1.5; margin: 8px 0; }
+  .btn { display: block; margin: 22px 0 10px; padding: 16px; border-radius: 999px; font-weight: 700; font-size: 1.1rem;
+    color: #fff; text-decoration: none; background: linear-gradient(135deg, #ffc84d, #ff6b4d); }
+  .code { font-family: ui-monospace, Menlo, monospace; font-size: 1.4rem; letter-spacing: 3px; font-weight: 700;
+    background: rgba(255,255,255,0.1); border-radius: 14px; padding: 10px; margin: 8px 0 4px; user-select: all; }
+  .small { font-size: 0.85rem; color: rgba(255,255,255,0.55); }
+  a.link { color: #9fd0ff; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="flag">🏁</div>
+  <h1 id="title">Gridora-Challenge</h1>
+  <div class="score" id="score" hidden></div>
+  <p id="sub">Gleiche Teile für alle, nur ein Versuch. Wer schafft die meisten Punkte?</p>
+  <a class="btn" id="open" href="gridora://challenge">In Gridora öffnen</a>
+  <p class="small">Klappt der Knopf nicht? Öffne Gridora, tippe bei „Challenge“ auf „Code eingeben“ und gib diesen Code ein:</p>
+  <div class="code" id="code">–</div>
+  <p class="small" style="margin-top:22px">Noch kein Gridora? Die Test-Version gibt es hier:<br>
+    <a class="link" href="https://testflight.apple.com/join/eV93PyNJ">TestFlight-Einladung öffnen</a></p>
+</div>
+<script>
+  // Crockford-Base32 wie in der App.
+  var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+  function base32(value, length) {
+    var out = "";
+    do { out = ALPHABET[value % 32] + out; value = Math.floor(value / 32); } while (value > 0);
+    while (length && out.length < length) out = "0" + out;
+    return out;
+  }
+  var params = new URLSearchParams(location.search);
+  var seed = parseInt(params.get("s") || "", 10);
+  var name = (params.get("n") || "").slice(0, 16);
+  var points = parseInt(params.get("p") || "", 10);
+  // Link selbst bauen: Leerzeichen als %20 (nicht "+"), damit die App den Namen richtig liest.
+  var query = "";
+  if (seed > 0 && seed <= 4294967295) {
+    query = "s=" + seed + (name ? "&n=" + encodeURIComponent(name) : "") + (points > 0 ? "&p=" + points : "");
+    document.getElementById("code").textContent = base32(seed, 7) + (points > 0 ? "-" + base32(points) : "");
+  } else if (params.get("c")) {
+    query = "c=" + encodeURIComponent(params.get("c"));
+    document.getElementById("code").textContent = params.get("c").toUpperCase();
+  }
+  document.getElementById("open").href = "gridora://challenge?" + query;
+  if (name && points > 0) {
+    document.getElementById("title").textContent = name + " fordert dich heraus!";
+    var score = document.getElementById("score");
+    score.textContent = points.toLocaleString("de-DE") + " Punkte";
+    score.hidden = false;
+    document.getElementById("sub").textContent = "Gleiche Teile, ein Versuch – schaffst du mehr?";
+  }
+</script>
+</body>
+</html>
