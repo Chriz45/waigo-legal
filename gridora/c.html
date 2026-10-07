@@ -56,6 +56,9 @@
   var query = "";
   if (seed > 0 && seed <= 4294967295) {
     query = "s=" + seed + (name ? "&n=" + encodeURIComponent(name) : "") + (points > 0 ? "&p=" + points : "");
+    // Geist (Verlauf Zug für Zug) unverändert weitergeben.
+    var ghost = params.get("g");
+    if (ghost && /^[A-Za-z0-9_-]{1,3600}$/.test(ghost)) query += "&g=" + ghost;
     document.getElementById("code").textContent = base32(seed, 7) + (points > 0 ? "-" + base32(points) : "");
   } else if (params.get("c")) {
     query = "c=" + encodeURIComponent(params.get("c"));
@@ -67,7 +70,9 @@
     var score = document.getElementById("score");
     score.textContent = points.toLocaleString("de-DE") + " Punkte";
     score.hidden = false;
-    document.getElementById("sub").textContent = "Gleiche Teile, ein Versuch – schaffst du mehr?";
+    document.getElementById("sub").textContent = params.get("g")
+      ? "Gleiche Teile, ein Versuch – und der Geist von " + name + " läuft Zug für Zug mit. Schaffst du mehr?"
+      : "Gleiche Teile, ein Versuch – schaffst du mehr?";
   }
 </script>
 </body>
