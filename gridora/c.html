@@ -59,13 +59,19 @@
     // Geist (Verlauf Zug für Zug) unverändert weitergeben.
     var ghost = params.get("g");
     if (ghost && /^[A-Za-z0-9_-]{1,3600}$/.test(ghost)) query += "&g=" + ghost;
+    if (params.get("l") === "1") query += "&l=1";
     document.getElementById("code").textContent = base32(seed, 7) + (points > 0 ? "-" + base32(points) : "");
   } else if (params.get("c")) {
     query = "c=" + encodeURIComponent(params.get("c"));
     document.getElementById("code").textContent = params.get("c").toUpperCase();
   }
   document.getElementById("open").href = "gridora://challenge?" + query;
-  if (name && points > 0) {
+  if (params.get("l") === "1") {
+    document.querySelector(".flag").textContent = "🔴";
+    document.getElementById("title").textContent = (name || "Jemand") + " spielt jetzt LIVE!";
+    document.getElementById("sub").textContent = "Komm rein – ihr spielt gleichzeitig mit denselben Teilen und seht eure Punkte live.";
+    document.getElementById("open").textContent = "Jetzt mitspielen";
+  } else if (name && points > 0) {
     document.getElementById("title").textContent = name + " fordert dich heraus!";
     var score = document.getElementById("score");
     score.textContent = points.toLocaleString("de-DE") + " Punkte";
